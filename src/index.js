@@ -5,6 +5,8 @@ import App from './App';
 import reportWebVitals from './reportWebVitals';
 
 const root = ReactDOM.createRoot(document.getElementById('root'));
+
+// 브라우저에 있는 실제 DOM 내부에 리액트 컴포넌트를 렌더링하겠다는 의미
 root.render(
   <React.StrictMode>
     <App />

@@ -1,40 +1,95 @@
-import React, {useRef} from 'react';
+import React, {useRef, useState} from 'react';
 // import Hello from './Hello';
 // import Wrapper from './Wrapper';
 // import Counter from './Counter';
 // import InputSample from './InputSample';
 import UserList from './UserList';
+import CreateUser from './CreateUser';
 import './App.css';
 
-// 12
+// 12 ~ 15
 function App() {
-  const users = [
+  const [inputs, setInputs] = useState({
+    username: '',
+    email: ''
+  });
+
+  const { username, email } = inputs;
+  const onChange = e => {
+    const { name, value } = e.target;
+    setInputs({
+      ...inputs,
+      [name]: value
+    });
+  };
+
+  const [users, setUsers] = useState([
     {
       id: 1,
       username: 'velopert',
-      email: 'public.velopert@gmail.com'
+      email: 'public.velopert@gmail.com',
+      active: true
     },
     {
       id: 2,
       username: 'tester',
-      email: 'tester@example.com'
+      email: 'tester@example.com',
+      active: false
     },
     {
       id: 3,
       username: 'liz',
-      email: 'liz@example.com'
+      email: 'liz@example.com',
+      active: false
     }
-  ];
+  ]);
 
   const nextId = useRef(4);
   const onCreate = () => {
-    // 나중에 구현 할 배열에 항목 추가하는 로직
-    // ...
+    const user = {
+      id: nextId.current,
+      username,
+      email
+    };
+    // 배열에 새 항목 추가 방법
+    // 1. spread 연산자 이용
+    setUsers([...users, user]);
+    // 2. concat 이용
+    // setUsers(users.concat(user));
 
+    setInputs({
+      username: '',
+      email: ''
+    });
     nextId.current += 1;
   };
-  
-  return <UserList users={users} />;
+
+  const onRemove = id => {
+    // 내장 함수 filter 사용하여 특정 원소를 배열에서 제거
+    // user.id 가 파라미터로 일치하지 않는 원소만 추출해서 새로운 배열을 만듦 (= user.id 가 id 인 것을 제거함)
+    setUsers(users.filter(user => user.id !== id));
+  };
+
+  const onToggle = id => {
+    setUsers(
+      // 배열의 불변성을 유지하며 배열을 업데이트할 때 -> map 사용
+      users.map(user =>
+        user.id === id ? { ...user, active: !user.active } : user
+      )
+    );
+  };
+
+  return (
+    <>
+      <CreateUser
+        username={username}
+        email={email}
+        onChange={onChange}
+        onCreate={onCreate}
+      />
+      <UserList users={users} onRemove={onRemove} onToggle={onToggle} />
+    </>
+  );
 }
 
 // 11

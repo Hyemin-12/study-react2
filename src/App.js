@@ -1,4 +1,4 @@
-import React, {useRef, useState} from 'react';
+import React, {useRef, useState, useMemo, useCallback} from 'react';
 // import Hello from './Hello';
 // import Wrapper from './Wrapper';
 // import Counter from './Counter';
@@ -7,7 +7,12 @@ import UserList from './UserList';
 import CreateUser from './CreateUser';
 import './App.css';
 
-// 12 ~ 15
+// 12 ~ 18
+function countActiveUsers(users) {
+  console.log('활성 사용자 수를 세는중...');
+  return users.filter(user => user.active).length;
+}
+
 function App() {
   const [inputs, setInputs] = useState({
     username: '',
@@ -45,7 +50,9 @@ function App() {
   ]);
 
   const nextId = useRef(4);
-  const onCreate = () => {
+
+  // useCallback : 특정 함수 재사용(useMemo와 유사 but useMemo는 결과값 재사용)
+  const onCreate = useCallback(() => {
     const user = {
       id: nextId.current,
       username,
@@ -62,22 +69,32 @@ function App() {
       email: ''
     });
     nextId.current += 1;
-  };
+  }, [users, username, email]);
 
-  const onRemove = id => {
-    // 내장 함수 filter 사용하여 특정 원소를 배열에서 제거
-    // user.id 가 파라미터로 일치하지 않는 원소만 추출해서 새로운 배열을 만듦 (= user.id 가 id 인 것을 제거함)
-    setUsers(users.filter(user => user.id !== id));
-  };
+  const onRemove = useCallback(
+    id => {
+      // 내장 함수 filter 사용하여 특정 원소를 배열에서 제거
+      // user.id 가 파라미터로 일치하지 않는 원소만 추출해서 새로운 배열을 만듦 (= user.id 가 id 인 것을 제거함)
+      setUsers(users.filter(user => user.id !== id));
+    },
+    [users]
+  );
+  const onToggle = useCallback(
+    id => {
+      setUsers(
+        // 배열의 불변성을 유지하며 배열을 업데이트할 때 -> map 사용
+        users.map(user =>
+          user.id === id ? { ...user, active: !user.active } : user
+        )
+      );
+    },
+    [users]
+  );
 
-  const onToggle = id => {
-    setUsers(
-      // 배열의 불변성을 유지하며 배열을 업데이트할 때 -> map 사용
-      users.map(user =>
-        user.id === id ? { ...user, active: !user.active } : user
-      )
-    );
-  };
+  // useMemo : 이전에 계산한 값을 재사용함 -> 성능 최적화
+  // useMemo의 첫번째 파라미터에는 어떻게 연산할지 정의하는 함수를, 두번째 파라미터에는 deps 배열을 넣어줌
+  // deps의 값이 바뀔 때만 함수가 실행, 그렇지 않으면 이전의 값을 재사용
+  const count = useMemo(() => countActiveUsers(users), [users]);
 
   return (
     <>
@@ -88,6 +105,7 @@ function App() {
         onCreate={onCreate}
       />
       <UserList users={users} onRemove={onRemove} onToggle={onToggle} />
+      <div>활성 사용자 수 : {count}</div>
     </>
   );
 }

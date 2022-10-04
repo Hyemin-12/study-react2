@@ -1,6 +1,6 @@
 import React, {useEffect} from 'react';
 
-function User({ user, onRemove, onToggle }) {
+const User = React.memo(function User({ user, onRemove, onToggle }) {
   // useEffect 
   // 첫 번째 파라미터로 함수, 두 번째 파라미터로 의존값이 들어있는 배열(deps)
   // 빈 배열을 넣으면, 컴포넌트가 처음 나타날 때만 useEffect에 등록한 함수 호출
@@ -42,7 +42,7 @@ function User({ user, onRemove, onToggle }) {
       <button onClick={() => onRemove(user.id)}>삭제</button>
     </div>
   );
-}
+});
 
 function UserList({ users, onRemove, onToggle }) {
   return (
@@ -54,4 +54,4 @@ function UserList({ users, onRemove, onToggle }) {
   );
 }
 
-export default UserList;
+export default React.memo(UserList);

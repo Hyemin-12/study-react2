@@ -20,13 +20,14 @@ function App() {
   });
 
   const { username, email } = inputs;
-  const onChange = e => {
+  
+  const onChange = useCallback(e => {
     const { name, value } = e.target;
-    setInputs({
+    setInputs(inputs => ({
       ...inputs,
       [name]: value
-    });
-  };
+    }));
+  }, []);
 
   const [users, setUsers] = useState([
     {
@@ -60,35 +61,35 @@ function App() {
     };
     // 배열에 새 항목 추가 방법
     // 1. spread 연산자 이용
-    setUsers([...users, user]);
+    // setUsers([...users, user]);
     // 2. concat 이용
-    // setUsers(users.concat(user));
+    setUsers(users => users.concat(user));
 
     setInputs({
       username: '',
       email: ''
     });
     nextId.current += 1;
-  }, [users, username, email]);
+  }, [username, email]);
 
   const onRemove = useCallback(
     id => {
       // 내장 함수 filter 사용하여 특정 원소를 배열에서 제거
       // user.id 가 파라미터로 일치하지 않는 원소만 추출해서 새로운 배열을 만듦 (= user.id 가 id 인 것을 제거함)
-      setUsers(users.filter(user => user.id !== id));
+      setUsers(users => users.filter(user => user.id !== id));
     },
-    [users]
+    []
   );
   const onToggle = useCallback(
     id => {
-      setUsers(
+      setUsers(users =>
         // 배열의 불변성을 유지하며 배열을 업데이트할 때 -> map 사용
         users.map(user =>
           user.id === id ? { ...user, active: !user.active } : user
         )
       );
     },
-    [users]
+    []
   );
 
   // useMemo : 이전에 계산한 값을 재사용함 -> 성능 최적화

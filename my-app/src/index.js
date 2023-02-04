@@ -12,9 +12,7 @@ import NotificationList from './chapter_06/NotificationList';
 const root = createRoot(document.getElementById("root"));
 
 root.render(
-    <React.StrictMode>
-        <NotificationList />
-    </React.StrictMode>
+    <NotificationList />
 );
 
 // If you want to start measuring performance in your app, pass a function
